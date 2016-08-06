@@ -1,0 +1,137 @@
+﻿<Window x:Class="CoffeeMachine.Wpf.Views.ShellView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:viewModels="clr-namespace:CoffeeMachine.Wpf.ViewModels"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:converters="clr-namespace:CoffeeMachine.Wpf.Converters"
+             xmlns:coffeeMachine="clr-namespace:CoffeeMachine;assembly=CoffeeMachine"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance viewModels:ShellViewModel}"
+             Height="700" Width="1000" ResizeMode="NoResize" WindowStyle="ToolWindow">
+
+    <Window.Resources>
+        <system:Double x:Key="FiveCentsCoin">0.05</system:Double>
+        <system:Double x:Key="TenCentsCoin">0.10</system:Double>
+        <system:Double x:Key="TwentyCentsCoin">0.20</system:Double>
+        <system:Double x:Key="FiftyCentsCoin">0.50</system:Double>
+        <system:Double x:Key="OneEuroCoin">1</system:Double>
+        <system:Double x:Key="TwoEurosCoin">2</system:Double>
+
+        <converters:StateMachineVisibilityConverter x:Key="StateVisibilityConverter"/>
+    </Window.Resources>
+
+    <Window.DataContext>
+        <viewModels:ShellViewModel></viewModels:ShellViewModel>
+    </Window.DataContext>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="187*"/>
+            <ColumnDefinition Width="310*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="18*"/>
+            <RowDefinition Height="25*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <!--App-->
+        <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!--Screen-->
+            <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Background="DarkGreen" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="{Binding CoffeeMachine.InsertedMoney}" ContentStringFormat=" {0}€" Foreground="WhiteSmoke" HorizontalContentAlignment="Right" FontSize="20" Margin="10,0,0,0"
+                   HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Consolas" />
+                    <Label Content="{Binding UserMessage}" Foreground="WhiteSmoke" HorizontalContentAlignment="Right" FontSize="14"
+                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </StackPanel>
+            </Grid>
+
+            <!--Insert coin-->
+            <Grid Grid.Row="1" Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Row="0"  Grid.Column="0" Content="0.20 €"
+                    Command="{Binding InsertCoinCommand}" Style="{StaticResource ButtonStyle}" CommandParameter="{StaticResource TwentyCentsCoin}" />
+                <Button Grid.Row="1"  Grid.Column="0" Content="0.50 €"
+                    Command="{Binding InsertCoinCommand}" Style="{StaticResource ButtonStyle}" CommandParameter="{StaticResource FiftyCentsCoin}" />
+                <Button Grid.Row="0"  Grid.Column="1" Content="1€"
+                    Command="{Binding InsertCoinCommand}" Style="{StaticResource ButtonStyle}" CommandParameter="{StaticResource OneEuroCoin}" />
+                <Button Grid.Row="1"  Grid.Column="1" Content="2€"
+                    Command="{Binding InsertCoinCommand}" Style="{StaticResource ButtonStyle}" CommandParameter="{StaticResource TwoEurosCoin}" />
+            </Grid>
+            <!--Refund money-->
+            <Button Grid.Row="2" Grid.Column="0" Style="{StaticResource ButtonStyle}" Command="{Binding RefundMoneyCommand}" Content="Refund money"/>
+
+            <!--Coffees-->
+            <Button Grid.Row="1" Grid.Column="1" Style="{StaticResource ButtonStyle}" Command="{Binding PrepareCoffeeCommand}">Prepare Coffee (2€)</Button>
+
+            <Button Grid.Row="2" Grid.Column="1" Style="{StaticResource ButtonStyle}" Command="{Binding TakeCoffeeCommand}" Content="Take my coffee!"
+            	FocusManager.IsFocusScope="True"/>
+
+
+        </Grid>
+
+        <!--State machine view-->
+        <Grid Grid.Row="0" Grid.RowSpan="2" Grid.Column="1">
+            <Image Source="../Images/StateMachine.png"/>
+
+            <Button x:Name="InIdleInsert" Visibility="{Binding CoffeeMachine.State, Converter={StaticResource StateVisibilityConverter}, ConverterParameter={x:Static coffeeMachine:CoffeeMachineState.Idle}}"
+                    Content="" HorizontalAlignment="Left" Height="23" Margin="186,154,0,0" VerticalAlignment="Top" Width="76" Background="#FF6EA0D3" Command="{Binding InsertCoinCommand}" CommandParameter="{StaticResource FiftyCentsCoin}"/>
+            <Button x:Name="InWithMoneyInsert" Visibility="{Binding CoffeeMachine.State, Converter={StaticResource StateVisibilityConverter}, ConverterParameter={x:Static coffeeMachine:CoffeeMachineState.WithMoney}}"
+                    Content="" HorizontalAlignment="Left" Height="23" Margin="31,312,0,0" VerticalAlignment="Top" Width="76" Background="#FF6EA0D3" Command="{Binding InsertCoinCommand}" CommandParameter="{StaticResource FiftyCentsCoin}"/>
+            <Button x:Name="InCanGetCoffeeInsert" Visibility="{Binding CoffeeMachine.State, Converter={StaticResource StateVisibilityConverter}, ConverterParameter={x:Static coffeeMachine:CoffeeMachineState.CanSelectCoffee}}"
+                    Content="" HorizontalAlignment="Left" Height="23" Margin="21,489,0,0" VerticalAlignment="Top" Width="76" Background="#FF6EA0D3" Command="{Binding InsertCoinCommand}" CommandParameter="{StaticResource FiftyCentsCoin}"/>
+
+            <Button x:Name="InWithMoneyRefund" Visibility="{Binding CoffeeMachine.State, Converter={StaticResource StateVisibilityConverter}, ConverterParameter={x:Static coffeeMachine:CoffeeMachineState.WithMoney}}"
+                    Content="" HorizontalAlignment="Left" Height="23" Margin="261,265,0,0" VerticalAlignment="Top" Width="76" Background="#FF6EA0D3" Command="{Binding RefundMoneyCommand}"/>
+            <Button x:Name="InCanGetCoffeeRefund" Visibility="{Binding CoffeeMachine.State, Converter={StaticResource StateVisibilityConverter}, ConverterParameter={x:Static coffeeMachine:CoffeeMachineState.CanSelectCoffee}}"
+                    Content="" HorizontalAlignment="Left" Height="24" Margin="261,436,0,0" VerticalAlignment="Top" Width="76" Background="#FF6EA0D3" Command="{Binding RefundMoneyCommand}"/>
+
+            <Button x:Name="InCanGetCoffeePrepare" Visibility="{Binding CoffeeMachine.State, Converter={StaticResource StateVisibilityConverter}, ConverterParameter={x:Static coffeeMachine:CoffeeMachineState.CanSelectCoffee}}"
+                    Content="" HorizontalAlignment="Left" Height="23" Margin="186,517,0,0" VerticalAlignment="Top" Width="76" Background="#FF6EA0D3" Command="{Binding PrepareCoffeeCommand}"/>
+
+            <Button x:Name="InTakeCoffeTake" Visibility="{Binding CoffeeMachine.State, Converter={StaticResource StateVisibilityConverter}, ConverterParameter={x:Static coffeeMachine:CoffeeMachineState.CoffeeReady}}"
+                    Content="" HorizontalAlignment="Left" Height="23" Margin="522,209,0,0" VerticalAlignment="Top" Width="76" Background="#FF6EA0D3" Command="{Binding TakeCoffeeCommand}"/>
+            <Ellipse x:Name="Idle" HorizontalAlignment="Left" Height="67" Margin="121,0,0,0" Stroke="Red" VerticalAlignment="Top" Width="118" StrokeThickness="10" 
+                     Visibility="{Binding CoffeeMachine.State, Converter={StaticResource StateVisibilityConverter}, ConverterParameter={x:Static coffeeMachine:CoffeeMachineState.Idle}}"/>
+            <Ellipse x:Name="WithMoney" HorizontalAlignment="Left" Height="65" Margin="121,209,0,0" Stroke="Red" VerticalAlignment="Top" Width="118" StrokeThickness="10"
+                     Visibility="{Binding CoffeeMachine.State, Converter={StaticResource StateVisibilityConverter}, ConverterParameter={x:Static coffeeMachine:CoffeeMachineState.WithMoney}}"/>
+            <Ellipse x:Name="CanGetCoffee" HorizontalAlignment="Left" Height="65" Margin="108,378,0,0" Stroke="Red" VerticalAlignment="Top" Width="145" StrokeThickness="10"
+                     Visibility="{Binding CoffeeMachine.State, Converter={StaticResource StateVisibilityConverter}, ConverterParameter={x:Static coffeeMachine:CoffeeMachineState.CanSelectCoffee}}"/>
+            <Ellipse x:Name="PreparingCoffee" HorizontalAlignment="Left" Height="75" Margin="98,570,0,0" Stroke="Red" VerticalAlignment="Top" Width="155" StrokeThickness="10"
+                     Visibility="{Binding CoffeeMachine.State, Converter={StaticResource StateVisibilityConverter}, ConverterParameter={x:Static coffeeMachine:CoffeeMachineState.PreparingCoffee}}"/>
+            <Ellipse x:Name="TakeCoffee" HorizontalAlignment="Left" Height="75" Margin="448,260,0,0" Stroke="Red" VerticalAlignment="Top" Width="137" StrokeThickness="10"
+                     Visibility="{Binding CoffeeMachine.State, Converter={StaticResource StateVisibilityConverter}, ConverterParameter={x:Static coffeeMachine:CoffeeMachineState.CoffeeReady}}"/>
+            <Ellipse x:Name="RefundingMoney" HorizontalAlignment="Left" Height="75" Margin="386,0,0,0" Stroke="Red" VerticalAlignment="Top" Width="155" StrokeThickness="10"
+                     Visibility="{Binding CoffeeMachine.State, Converter={StaticResource StateVisibilityConverter}, ConverterParameter={x:Static coffeeMachine:CoffeeMachineState.RefundMoney}}"/>
+
+        </Grid>
+
+        <!--Status-->
+        <StatusBar Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" >
+            <Label Content="{Binding CoffeeMachine.State}" FontStyle="Italic"></Label>
+        </StatusBar>
+    </Grid>
+
+
+</Window>
+
+    
